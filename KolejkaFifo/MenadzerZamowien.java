@@ -1,78 +1,83 @@
 package KolejkaFifo;
 
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-// Klasa MenadzerZamowien zarządza listą zamówień
+// Klasa MenadzerZamowien zarządza zamówieniami
+// Przechowuje zamówienia w dwóch miejscach:
+// - listaZamowien: ArrayList, żeby zachować kolejność zamówień (FIFO)
+// - mapaZamowien: HashMap, żeby szybko znaleźć zamówienie po ID
 // Implementuje interfejs PriorytetZamowienia
 public class MenadzerZamowien implements PriorytetZamowienia {
 
-    private List<Zamowienie> zamowienia; // Lista zamówień
+    private List<Zamowienie> listaZamowien;  // lista zamówień w kolejności
+    private Map<Integer, Zamowienie> mapaZamowien; // mapa zamówień po ID
 
-    // Konstruktor tworzy pustą listę zamówień
+    // Konstruktor tworzy puste struktury
     public MenadzerZamowien() {
-        this.zamowienia = new ArrayList<>();
+        this.listaZamowien = new ArrayList<>();
+        this.mapaZamowien = new HashMap<>();
     }
 
-    // Dodaj nowe zamówienie
+    // Dodaj zamówienie jeśli ID nie istnieje
     public void dodajZamowienie(Zamowienie z) {
-        zamowienia.add(z);
+        int id = z.getIdZamowienia();
+        if (mapaZamowien.containsKey(id)) {
+            System.out.println("Zamówienie o ID " + id + " już jest. Nie dodaję.");
+            return;
+        }
+        listaZamowien.add(z);
+        mapaZamowien.put(id, z);
         System.out.println("Zamówienie dodane.");
     }
 
-    // Usuń zamówienie na podstawie ID
+    // Usuń zamówienie po ID
     public void usunZamowienie(int id) {
-        boolean znaleziono = false;
-        for (Zamowienie z : zamowienia) {
-            if (z.getIdZamowienia() == id) {
-                zamowienia.remove(z);
-                System.out.println("Zamówienie usunięte.");
-                znaleziono = true;
-                break;
-            }
-        }
-        if (!znaleziono) {
+        Zamowienie z = mapaZamowien.remove(id);
+        if (z != null) {
+            listaZamowien.remove(z);
+            System.out.println("Zamówienie usunięte.");
+        } else {
             System.out.println("Nie znaleziono zamówienia o ID: " + id);
         }
     }
 
-    // Zaktualizuj produkt lub klienta w istniejącym zamówieniu
+    // Aktualizuj klienta i produkt w zamówieniu o podanym ID
     public void aktualizujZamowienie(int id, Klient nowyKlient, Produkt nowyProdukt) {
-        for (Zamowienie z : zamowienia) {
-            if (z.getIdZamowienia() == id) {
-                z.setKlient(nowyKlient);
-                z.setProdukt(nowyProdukt);
-                System.out.println("Zamówienie zaktualizowane.");
-                return;
-            }
-        }
-        System.out.println("Nie znaleziono zamówienia o ID: " + id);
-    }
-
-    // Wyświetl wszystkie zamówienia z informacją o priorytecie
-    public void wyswietlZamowienia() {
-        if (zamowienia.isEmpty()) {
-            System.out.println("Brak zamówień.");
+        Zamowienie z = mapaZamowien.get(id);
+        if (z != null) {
+            z.setKlient(nowyKlient);
+            z.setProdukt(nowyProdukt);
+            System.out.println("Zamówienie zaktualizowane.");
         } else {
-            for (Zamowienie z : zamowienia) {
-                String priorytet = czyWysokiPriorytet(z) ? "Wysoki" : "Niski";
-                System.out.println(z); // toString() z klasy Zamowienie
-                System.out.println("Priorytet: " + priorytet);
-                System.out.println("------------------------");
-            }
+            System.out.println("Nie znaleziono zamówienia o ID: " + id);
         }
     }
 
-    // Implementacja metody interfejsu PriorytetZamowienia
-    // Priorytet wysoki jeśli ID zamówienia < 5
+    // Wyświetl wszystkie zamówienia z priorytetem
+    public void wyswietlZamowienia() {
+        if (listaZamowien.isEmpty()) {
+            System.out.println("Brak zamówień.");
+            return;
+        }
+        for (Zamowienie z : listaZamowien) {
+            String priorytet = czyWysokiPriorytet(z) ? "Wysoki" : "Niski";
+            System.out.println(z);
+            System.out.println("Priorytet: " + priorytet);
+            System.out.println("------------------------");
+        }
+    }
+
+    // Metoda z interfejsu - wysokie priorytety to te z ID < 5
     @Override
     public boolean czyWysokiPriorytet(Zamowienie zamowienie) {
         return zamowienie.getIdZamowienia() < 5;
     }
 
-    // Getter do listy zamówień (jeśli potrzebujesz gdzie indziej)
+    // Getter do listy zamówień (FIFO)
     public List<Zamowienie> getZamowienia() {
-        return zamowienia;
+        return listaZamowien;
     }
 }
