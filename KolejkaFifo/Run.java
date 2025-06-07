@@ -6,6 +6,8 @@ public class Run {
     public void start() {
         // Tworzymy menadżera zamówień
         MenadzerZamowien menadzer = new MenadzerZamowien();
+        ZapiszDoPliku zapis = new ZapiszDoPliku();
+        String sciezkaPliku = "zamowienia.txt";
 
         Scanner sc = new Scanner(System.in);
         boolean dziala = true;
@@ -16,7 +18,9 @@ public class Run {
             System.out.println("2. Usuń zamówienie");
             System.out.println("3. Aktualizuj zamówienie");
             System.out.println("4. Wyświetl wszystkie zamówienia");
-            System.out.println("5. Wyjście");
+            System.out.println("5. Zapisz zamówienia do pliku");
+            System.out.println("6. Wczytaj zamówienia do pliku");
+            System.out.println("7. Wyjście");
             System.out.print("Wybierz opcję: ");
 
             int wybor = sc.nextInt();
@@ -127,8 +131,13 @@ public class Run {
                 case 4:
                     menadzer.wyswietlZamowienia();
                     break;
-
                 case 5:
+                    zapis.zapiszZamowienia(menadzer.getZamowienia() , sciezkaPliku);
+                    break;
+                case 6:
+                    zapis.wczytajZamowienia(sciezkaPliku);
+                    break;
+                case 7:
                     dziala = false;
                     System.out.println("Zakończono działanie programu.");
                     break;
