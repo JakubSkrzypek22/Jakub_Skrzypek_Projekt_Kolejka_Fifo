@@ -1,4 +1,4 @@
-# Projekt-In-ynierski-Fifo-Jakub-Skrzypek
+
 # Kolejka FIfo - Prosty System Zarządzania Zamówieniami
 
 ## Opis
